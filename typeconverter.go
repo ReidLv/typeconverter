@@ -7,21 +7,6 @@ import (
 	"time"
 )
 
-/*
-	basic types are:
-
-		- int
-		- bool
-		- float32
-		- *time.Time
-		- string/Stringer
-		- []bool
-		- []int
-		- []float32
-		- []string
-		- []*time.Time
-*/
-
 func ToString(i interface{}) (r string) {
 	switch v := i.(type) {
 	case *time.Time:

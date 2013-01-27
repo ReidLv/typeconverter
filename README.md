@@ -15,3 +15,6 @@ conversion between the following go types:
  - []float32
  - []string
  - []*time.Time
+
+
+see the Documentation at http://godoc.org/github.com/metakeule/typeconverter

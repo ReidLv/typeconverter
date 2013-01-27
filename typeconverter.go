@@ -1,11 +1,25 @@
 package typeconverter
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 )
+
+// checks, if something is a string or Stringer
+func IsString(i interface{}) bool {
+	if _, ok := i.(string); ok {
+		return true
+	}
+
+	if _, ok := i.(fmt.Stringer); ok {
+		return true
+	}
+
+	return false
+}
 
 func ToString(i interface{}) (r string) {
 	switch v := i.(type) {
@@ -23,7 +37,7 @@ func ToString(i interface{}) (r string) {
 			s = append(s, ToString(i))
 		}
 		r = strings.Join(s, ",")
-	case []float32:
+	case []float64:
 		s := []string{}
 		for _, i := range v {
 			s = append(s, ToString(i))
@@ -50,7 +64,13 @@ func ToString(i interface{}) (r string) {
 		}
 		r = strings.Join(s, ",")
 	default:
-		r = fmt.Sprintf("%v", v)
+		if IsString(v) {
+			r = fmt.Sprintf("%v", v)
+		} else {
+			b, _ := json.Marshal(v)
+			r = string(b)
+		}
+
 	}
 	return
 }
@@ -68,10 +88,9 @@ func ToBool(o interface{}) (b bool, err error) {
 	return
 }
 
-func ToFloat(o interface{}) (f float32, err error) {
+func ToFloat(o interface{}) (f float64, err error) {
 	s := ToString(o)
-	ff, err := strconv.ParseFloat(s, 32)
-	f = float32(ff)
+	f, err = strconv.ParseFloat(s, 64)
 	return
 }
 
@@ -113,17 +132,17 @@ func ToBoolArr(o interface{}) (ia []bool, err error) {
 	return
 }
 
-func ToFloatArr(o interface{}) (ia []float32, err error) {
+func ToFloatArr(o interface{}) (ia []float64, err error) {
 	s := ToString(o)
 	a := strings.Split(s, ",")
-	ia = []float32{}
+	ia = []float64{}
 	for _, ii := range a {
 		iii, e := strconv.ParseFloat(ii, 32)
 		if e != nil {
 			err = e
 			return
 		}
-		ia = append(ia, float32(iii))
+		ia = append(ia, float64(iii))
 	}
 	return
 }
@@ -150,6 +169,46 @@ func ToTimeArr(o interface{}) (ia []*time.Time, err error) {
 			return
 		}
 		ia = append(ia, &iii)
+	}
+	return
+}
+
+func ToArr(o interface{}) (ia []interface{}, err error) {
+	ia = []interface{}{}
+	s := ToString(o)
+	err = json.Unmarshal([]byte(s), &ia)
+	return
+}
+
+func ToStringMap(o interface{}) (m map[string]interface{}, err error) {
+	m = map[string]interface{}{}
+	s := ToString(o)
+	err = json.Unmarshal([]byte(s), &m)
+	return
+}
+
+func ToIntMap(o interface{}) (m map[int]interface{}, err error) {
+	m = map[int]interface{}{}
+	switch t := o.(type) {
+	case []interface{}:
+		for k, v := range t {
+			m[k] = v
+		}
+	default:
+		var a []interface{}
+		a, err = ToArr(o)
+		for k, v := range a {
+			m[k] = v
+		}
+	}
+	return
+}
+
+func ToStringStringMap(o interface{}) (m map[string]string, err error) {
+	m = map[string]string{}
+	s, err := ToStringMap(o)
+	for k, v := range s {
+		m[k] = ToString(v)
 	}
 	return
 }

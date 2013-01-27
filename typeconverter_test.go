@@ -39,7 +39,7 @@ var toBoolTests = map[interface{}]bool{
 	"true":  true,
 	"false": false,
 }
-var toFloatTests = map[interface{}]float32{
+var toFloatTests = map[interface{}]float64{
 	2.3:   2.3,
 	"2.3": 2.3,
 	2:     2.0,
@@ -53,6 +53,7 @@ func init() {
 	toStringTests[&ti] = "2010-01-26T18:53:18+01:00"
 	toTimeTests[&ti] = &ti
 	toTimeTests["2010-01-26T18:53:18+01:00"] = &ti
+
 }
 
 func TestToString(t *testing.T) {
@@ -60,6 +61,29 @@ func TestToString(t *testing.T) {
 		if r := ToString(in); r != out {
 			err(t, "ToString", r, out)
 		}
+	}
+}
+
+func TestMapToString(t *testing.T) {
+	m := map[string]int{"a": 2}
+	s := ToString(m)
+
+	if s != `{"a":2}` {
+		err(t, "IntMapToString", s, `{"a":2}`)
+	}
+
+	ms := map[string]string{"a": "2"}
+	s = ToString(ms)
+
+	if s != `{"a":"2"}` {
+		err(t, "StringMapToString", s, `{"a":"2"}`)
+	}
+
+	mi := map[string]interface{}{"a": 2}
+	s = ToString(mi)
+
+	if s != `{"a":2}` {
+		err(t, "InterfaceMapToString", s, `{"a":2}`)
 	}
 }
 
@@ -83,8 +107,8 @@ func TestToIntArr(t *testing.T) {
 }
 
 func TestToFloatArr(t *testing.T) {
-	if r, _ := ToFloatArr("3.5,4.6,5.7"); r[0] != 3.5 || r[1] != 4.6 || r[2] != 5.7 {
-		err(t, "ToFloatArr", r, []float32{3.5, 4.6, 5.7})
+	if r, _ := ToFloatArr("3.5,4.5,5.5"); r[0] != 3.5 || r[1] != 4.5 || r[2] != 5.5 {
+		err(t, "ToFloatArr", r, []float64{3.5, 4.5, 5.5})
 	}
 }
 
@@ -127,5 +151,50 @@ func TestToTime(t *testing.T) {
 		if r, _ := ToTime(in); r.Format(time.RFC3339) != out.Format(time.RFC3339) {
 			err(t, "ToTime", r, out)
 		}
+	}
+}
+
+func TestToStringMap(t *testing.T) {
+	s := `{"a": 2,"b": "3","c": 4.5}`
+	m, _ := ToStringMap(s)
+
+	// warning: json renders all numbers to float64
+	if m["a"] != 2.0 || m["b"] != "3" || m["c"] != 4.5 {
+		err(t, "ToStringMap", m, map[string]interface{}{"a": 2.0, "b": "3", "c": 4.5})
+	}
+}
+
+func TestToIntMap(t *testing.T) {
+	s := []interface{}{2, "3", 4.5}
+	m, _ := ToIntMap(s)
+
+	if m[0] != 2 || m[1] != "3" || m[2] != 4.5 {
+		err(t, "ToIntMap []interface{} input", m, map[int]interface{}{0: 2, 1: "3", 2: 4.5})
+	}
+
+	ss := `[2,"3",4.5]`
+	m, _ = ToIntMap(ss)
+	// warning: json renders all numbers to float64
+	if m[0] != 2.0 || m[1] != "3" || m[2] != 4.5 {
+		err(t, "ToIntMap json string input", m, map[int]interface{}{0: 2.0, 1: "3", 2: 4.5})
+	}
+}
+
+func TestToArr(t *testing.T) {
+	s := `[2,"3",4.5]`
+	m, _ := ToArr(s)
+
+	// warning: json renders all numbers to float64
+	if m[0] != 2.0 || m[1] != "3" || m[2] != 4.5 {
+		err(t, "ToStringMap", m, []interface{}{2.0, "3", 4.5})
+	}
+}
+
+func TestToStringStringMap(t *testing.T) {
+	s := `{"a": 2,"b": "3","c": 4.5}`
+	m, _ := ToStringStringMap(s)
+
+	if m["a"] != "2" || m["b"] != "3" || m["c"] != "4.5" {
+		err(t, "ToStringMap", m, map[string]string{"a": "2", "b": "3", "c": "4.5"})
 	}
 }

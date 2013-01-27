@@ -15,6 +15,9 @@ conversion between the following go types:
  - []float32
  - []string
  - []*time.Time
-
+ - []interface{}
+ - map[string]string
+ - map[string]interface{}
+ - map[int]interface{}
 
 see the Documentation at http://godoc.org/github.com/metakeule/typeconverter

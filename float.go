@@ -19,7 +19,7 @@ func roundViaFloat(x float64, prec int) float64 {
 	return f
 }
 
-func toInt32(x float64) int {
+func toInt(x float64) int {
 	return int(math.Floor(roundViaFloat(x, 0)))
 }
 
@@ -32,7 +32,7 @@ type Float float64
 func (ø Float) String() string  { return fmt.Sprintf("%v", ø.Float()) }
 func (ø Float) Float() float64  { return float64(ø) }
 func (ø Float) Json() string    { return ø.String() }
-func (ø Float) Int() int        { return toInt32(ø.Float()) }
+func (ø Float) Int() int        { return toInt(ø.Float()) }
 func (ø Float) Time() time.Time { return time.Unix(toInt64(ø.Float()), 0) }
 
 type Float32 float32
@@ -40,5 +40,5 @@ type Float32 float32
 func (ø Float32) String() string  { return fmt.Sprintf("%v", ø.Float()) }
 func (ø Float32) Float() float64  { return float64(ø) }
 func (ø Float32) Json() string    { return ø.String() }
-func (ø Float32) Int() int        { return toInt32(ø.Float()) }
+func (ø Float32) Int() int        { return toInt(ø.Float()) }
 func (ø Float32) Time() time.Time { return time.Unix(toInt64(ø.Float()), 0) }

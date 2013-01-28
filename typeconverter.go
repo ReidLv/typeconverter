@@ -1,7 +1,6 @@
 package typeconverter
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/metakeule/dispatch"
 	"time"
@@ -26,6 +25,18 @@ func (ø *BasicConverter) Convert(from interface{}, to interface{}) (err error) 
 	return
 }
 
+var intInstance = int(0)
+var int32Instance = int32(0)
+var int64Instance = int64(0)
+var float64Instance = float64(0)
+var float32Instance = float32(0)
+var stringInstance = string("")
+var jsonInstance = Json("")
+var boolInstance = bool(true)
+var timeInstance = time.Time{}
+var mapInstance = map[string]interface{}{}
+var arrInstance = []interface{}{}
+
 var basicConvert = New()
 
 func Convert(from interface{}, to interface{}) (err error) { return basicConvert.Convert(from, to) }
@@ -33,109 +44,50 @@ func Convert(from interface{}, to interface{}) (err error) { return basicConvert
 func New() (ø *BasicConverter) {
 	ø = &BasicConverter{dispatch.New(), dispatch.New()}
 
-	ø.Input.AddType(Int(0))
-	ø.Input.AddType(Int64(0))
-	ø.Input.AddType(Float(0.0))
-	ø.Input.AddType(Float32(0.0))
-	ø.Input.AddType(Bool(true))
-	ø.Input.AddType(String(""))
-	ø.Input.AddType(Time(time.Time{}))
-	ø.Input.AddType(Json(""))
-	ø.Input.AddType(Map(map[string]interface{}{}))
-	ø.Input.AddType(Array([]interface{}{}))
-	ø.Input.AddType(Default(0))
-
-	ø.Input.AddType(int(0))
-	ø.Input.AddType(int64(0))
-	ø.Input.AddType(int32(0))
-	ø.Input.AddType(float64(0.0))
-	ø.Input.AddType(float32(0.0))
-	ø.Input.AddType(bool(true))
-	ø.Input.AddType(string(""))
-	ø.Input.AddType(time.Time{})
-	ø.Input.AddType(map[string]interface{}{})
-	ø.Input.AddType([]interface{}{})
-
-	inSwitcher := func(from interface{}, to interface{}) (err error) {
+	inSwitch := func(from interface{}, to interface{}) (err error) {
 		switch t := from.(type) {
 		case int:
-			ø.Output.Dispatch(to, Int(t))
+			err = ø.Output.Dispatch(to, Int(t))
 		case int32:
-			ø.Output.Dispatch(to, Int(t))
+			err = ø.Output.Dispatch(to, Int(t))
 		case int64:
-			ø.Output.Dispatch(to, Int64(t))
+			err = ø.Output.Dispatch(to, Int64(t))
 		case float64:
-			ø.Output.Dispatch(to, Float(t))
+			err = ø.Output.Dispatch(to, Float(t))
 		case float32:
-			ø.Output.Dispatch(to, Float32(t))
+			err = ø.Output.Dispatch(to, Float32(t))
 		case string:
-			ø.Output.Dispatch(to, String(t))
+			err = ø.Output.Dispatch(to, String(t))
 		case bool:
-			ø.Output.Dispatch(to, Bool(t))
+			err = ø.Output.Dispatch(to, Bool(t))
 		case time.Time:
-			ø.Output.Dispatch(to, Time(t))
+			err = ø.Output.Dispatch(to, Time(t))
 		case map[string]interface{}:
-			ø.Output.Dispatch(to, Map(t))
+			err = ø.Output.Dispatch(to, Map(t))
 		case []interface{}:
-			ø.Output.Dispatch(to, Array(t))
+			err = ø.Output.Dispatch(to, Array(t))
 		default:
-			ø.Output.Dispatch(to, t)
+			err = ø.Output.Dispatch(to, t)
 		}
 		return
 	}
 
-	ø.Input.SetHandler("int", inSwitcher)
-	ø.Input.SetHandler("int32", inSwitcher)
-	ø.Input.SetHandler("int64", inSwitcher)
-	ø.Input.SetHandler("float64", inSwitcher)
-	ø.Input.SetHandler("float32", inSwitcher)
-	ø.Input.SetHandler("string", inSwitcher)
-	ø.Input.SetHandler("bool", inSwitcher)
-	ø.Input.SetHandler("time.Time", inSwitcher)
-	ø.Input.SetHandler("map[string]interface {}", inSwitcher)
-	ø.Input.SetHandler("[]interface {}", inSwitcher)
+	ø.Input.SetHandler(intInstance, inSwitch)
+	ø.Input.SetHandler(int32Instance, inSwitch)
+	ø.Input.SetHandler(int64Instance, inSwitch)
+	ø.Input.SetHandler(float64Instance, inSwitch)
+	ø.Input.SetHandler(float32Instance, inSwitch)
+	ø.Input.SetHandler(stringInstance, inSwitch)
+	ø.Input.SetHandler(boolInstance, inSwitch)
+	ø.Input.SetHandler(timeInstance, inSwitch)
+	ø.Input.SetHandler(mapInstance, inSwitch)
+	ø.Input.SetHandler(arrInstance, inSwitch)
 
 	ø.Input.AddFallback(func(in interface{}, out interface{}) (didHandle bool, err error) {
 		didHandle = true
-		if ø.Input.HasTypeForInstance(in) {
-			// make a default dispatch for known types
-			ø.Output.Dispatch(out, in)
-			return
-		}
-		if isString(in) {
-			ø.Output.Dispatch(out, String(fmt.Sprintf("%s", in)))
-		} else {
-			b, err := json.Marshal(in)
-			if err != nil {
-				panic("can't convert " + fmt.Sprintf("%#v", in) + " to anything reasonable or jsonable")
-			}
-			ø.Output.Dispatch(out, String(string(b)))
-		}
+		err = ø.Output.Dispatch(out, in)
 		return
 	})
-
-	i := int(0)
-	ø.Output.AddType(&i)
-	i1 := int32(0)
-	ø.Output.AddType(&i1)
-	i2 := int64(0)
-	ø.Output.AddType(&i2)
-	fl := float64(0)
-	ø.Output.AddType(&fl)
-	fl2 := float32(0)
-	ø.Output.AddType(&fl2)
-	st := string("")
-	ø.Output.AddType(&st)
-	js := Json("")
-	ø.Output.AddType(&js)
-	t := bool(true)
-	ø.Output.AddType(&t)
-	tm := time.Time{}
-	ø.Output.AddType(&tm)
-	mp := map[string]interface{}{}
-	ø.Output.AddType(&mp)
-	arr := []interface{}{}
-	ø.Output.AddType(&arr)
 
 	outSwitcher := func(out interface{}, in interface{}) (err error) {
 		switch t := out.(type) {
@@ -165,16 +117,16 @@ func New() (ø *BasicConverter) {
 		return
 	}
 
-	ø.Output.SetHandler("*bool", outSwitcher)
-	ø.Output.SetHandler("*int", outSwitcher)
-	ø.Output.SetHandler("*int32", outSwitcher)
-	ø.Output.SetHandler("*int64", outSwitcher)
-	ø.Output.SetHandler("*string", outSwitcher)
-	ø.Output.SetHandler("*float64", outSwitcher)
-	ø.Output.SetHandler("*float32", outSwitcher)
-	ø.Output.SetHandler("*time.Time", outSwitcher)
-	ø.Output.SetHandler("*typeconverter.Json", outSwitcher)
-	ø.Output.SetHandler("*map[string]interface {}", outSwitcher)
-	ø.Output.SetHandler("*[]interface {}", outSwitcher)
+	ø.Output.SetHandler(&boolInstance, outSwitcher)
+	ø.Output.SetHandler(&intInstance, outSwitcher)
+	ø.Output.SetHandler(&int32Instance, outSwitcher)
+	ø.Output.SetHandler(&int64Instance, outSwitcher)
+	ø.Output.SetHandler(&stringInstance, outSwitcher)
+	ø.Output.SetHandler(&float64Instance, outSwitcher)
+	ø.Output.SetHandler(&float32Instance, outSwitcher)
+	ø.Output.SetHandler(&timeInstance, outSwitcher)
+	ø.Output.SetHandler(&jsonInstance, outSwitcher)
+	ø.Output.SetHandler(&mapInstance, outSwitcher)
+	ø.Output.SetHandler(&arrInstance, outSwitcher)
 	return
 }

@@ -10,6 +10,75 @@ func err(t *testing.T, msg string, is interface{}, shouldbe interface{}) {
 	t.Errorf(msg+": is %#v, should be %#v\n", is, shouldbe)
 }
 
+type Special string
+
+func (ø Special) Int() int {
+	return 42
+}
+
+func dispatchToSpecial(out interface{}, in interface{}) (err error) {
+	*out.(*Special) = Special(in.(Stringer).String())
+	return
+}
+
+// convert time to string
+func ExampleConvert() {
+	var s string
+	t1, _ := time.Parse(time.RFC3339, "2011-01-26T18:53:18+01:00")
+	Convert(t1, &s)
+	fmt.Println(s)
+	// Output: 2011-01-26T18:53:18+01:00
+}
+
+func ExampleNew_ownType() {
+	/* we defined
+	type Special string
+
+	func (ø Special) Int() int {
+		return 42
+	}
+
+	*/
+	c := New()
+	sp := Special("")
+	c.Input.AddType(sp)
+	c.Output.AddType(&sp)
+	c.Output.SetHandler("*typeconverter.Special", func(out interface{}, in interface{}) (err error) {
+		*out.(*Special) = Special(in.(Stringer).String())
+		return
+	})
+
+	s := Special("")
+	var r int
+	c.Convert(s, &r)
+	fmt.Printf("to int: %v\n", r)
+
+	c.Convert(float64(4.5), &s)
+	fmt.Printf("to special: %v\n", s)
+
+	var t time.Time
+	e := c.Convert(Special(""), &t)
+	fmt.Println(e)
+	// Output: to int: 42
+	// to special: 4.5
+	// interface conversion: typeconverter.Special is not typeconverter.Timer: missing method Time
+}
+
+func ExampleNew_overwrite() {
+	c := New()
+	// if input should be transformed to string
+	// change the output and add " was the answer" to normal string conversion
+	c.Output.SetHandler("*string",
+		func(out interface{}, in interface{}) (err error) {
+			*out.(*string) = in.(Stringer).String() + " was the answer"
+			return
+		})
+	var s string
+	c.Convert(42, &s)
+	fmt.Println(s)
+	// Output: 42 was the answer
+}
+
 var _ = fmt.Errorf
 var ti, _ = time.Parse(time.RFC3339, "2011-01-26T18:53:18+01:00")
 
@@ -22,12 +91,23 @@ var toInt = map[interface{}]int{
 	Json(`3`):    3,
 	`1`:          1,
 	`1.0`:        1,
+	ti:           1296064398,
 }
+
+/*
+func TestError(t *testing.T) {
+	var r time.Time
+	if e := Convert(Special(""), &r); e == nil {
+		err(t, "Convert error", false, true)
+	}
+}
+*/
 
 func TestToInt(t *testing.T) {
 	for in, out := range toInt {
-		if r := Convert(in).ToInt(); r != out {
-			err(t, "ToInt", r, out)
+		var r int
+		if Convert(in, &r); r != out {
+			err(t, "Convert to int", r, out)
 		}
 	}
 }
@@ -45,7 +125,8 @@ var toFloat = map[interface{}]float64{
 
 func TestToFloat(t *testing.T) {
 	for in, out := range toFloat {
-		if r := Convert(in).ToFloat(); r != out {
+		var r float64
+		if Convert(in, &r); r != out {
 			err(t, "ToFloat", r, out)
 		}
 	}
@@ -61,9 +142,10 @@ var toBool = map[interface{}]bool{
 }
 
 func TestToBool(t *testing.T) {
+	var r bool
 	for in, out := range toBool {
-		if r := Convert(in).ToBool(); r != out {
-			err(t, "ToBool", r, out)
+		if Convert(in, &r); r != out {
+			err(t, "ToBool2", r, out)
 		}
 	}
 }
@@ -81,20 +163,22 @@ var toString = map[interface{}]string{
 
 func TestToString(t *testing.T) {
 	for in, out := range toString {
-		if r := Convert(in).ToString(); r != out {
+		var r string
+		if Convert(in, &r); r != out {
 			err(t, "ToString", r, out)
 		}
 	}
 
 	m := map[string]interface{}{"a": 3}
 	out := `{"a":3}`
-	if r := Convert(m).ToString(); r != out {
+	var r string
+	if Convert(m, &r); r != out {
 		err(t, "ToString", r, out)
 	}
 
 	a := []interface{}{"a", 3, 4.5}
 	out = `["a",3,4.5]`
-	if r := Convert(a).ToString(); r != out {
+	if Convert(a, &r); r != out {
 		err(t, "ToString", r, out)
 	}
 
@@ -106,13 +190,15 @@ var toArray = map[interface{}][]interface{}{
 
 func TestToArray(t *testing.T) {
 	for in, out := range toArray {
-		if r := Convert(in).ToArray(); r[0].(string) != out[0].(string) || ToInt(r[1].(float64)) != out[1].(int) {
+		var r []interface{}
+		if Convert(in, &r); r[0].(string) != out[0].(string) || ToInt(r[1].(float64)) != out[1].(int) {
 			err(t, "ToArray", r, out)
 		}
 	}
 
 	out := []interface{}{"a", 3}
-	if r := Convert(out).ToArray(); r[0].(string) != out[0].(string) || r[1].(int) != out[1].(int) {
+	var r []interface{}
+	if Convert(out, &r); r[0].(string) != out[0].(string) || r[1].(int) != out[1].(int) {
 		err(t, "ToArray", r, out)
 	}
 }
@@ -123,14 +209,16 @@ var toMap = map[interface{}]map[string]interface{}{
 
 func TestToMap(t *testing.T) {
 	for in, out := range toMap {
-		if r := Convert(in).ToMap(); r["a"] != out["a"] {
-			err(t, "ToMap", r["a"], out["a"])
+		var r map[string]interface{}
+		if Convert(in, &r); r["a"] != out["a"] {
+			err(t, "ToMap", r, out)
 		}
 	}
 
 	out := map[string]interface{}{"a": "b"}
-	if r := Convert(out).ToMap(); r["a"] != out["a"] {
-		err(t, "ToMap", r["a"], out["a"])
+	var r map[string]interface{}
+	if Convert(out, &r); r["a"] != out["a"] {
+		err(t, "ToMap", r, out)
 	}
 
 }
@@ -147,8 +235,9 @@ var toTime = map[interface{}]string{
 
 func TestToTime(t *testing.T) {
 	for in, out := range toTime {
-		if r := Time(Convert(in).ToTime()).String(); r != out {
-			err(t, "ToTime", r, out)
+		var r time.Time
+		if Convert(in, &r); Time(r).String() != out {
+			err(t, "ToTime", Time(r).String(), out)
 		}
 	}
 }
@@ -166,21 +255,23 @@ var toJson = map[interface{}]string{
 
 func TestToJson(t *testing.T) {
 	for in, out := range toJson {
-		if r := Convert(in).ToJson(); r != out {
-			err(t, "ToJson", r, out)
+		var r Json
+		if Convert(in, &r); string(r) != out {
+			err(t, "ToJson", string(r), out)
 		}
 	}
 
 	m := map[string]interface{}{"a": 3}
 	out := `{"a":3}`
-	if r := Convert(m).ToJson(); r != out {
-		err(t, "ToJson", r, out)
+	var r Json
+	if Convert(m, &r); string(r) != out {
+		err(t, "ToJson", string(r), out)
 	}
 
 	a := []interface{}{"a", 3, 4.5}
 	out = `["a",3,4.5]`
-	if r := Convert(a).ToJson(); r != out {
-		err(t, "ToJson", r, out)
+	if Convert(a, &r); string(r) != out {
+		err(t, "ToJson", string(r), out)
 	}
 
 }

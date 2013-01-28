@@ -1,9 +1,11 @@
-typeconverter
-=============
+// Copyright 2013 Marc René Arns. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
-[![Build Status](https://secure.travis-ci.org/metakeule/typeconverter.png)](http://travis-ci.org/metakeule/typeconverter)
+/*
+Package typeconverter provides an flexible way to do conversion between types.
 
-conversion between the following go types (it is possible to add your own):
+Out of the box the following go types are supported (it is possible to add your own and overwrite the conversions):
 
  - int
  - bool
@@ -16,7 +18,6 @@ conversion between the following go types (it is possible to add your own):
  - map[string]interface{}
 
 Example
--------
 
 For the main types you may simply use Convert()
 
@@ -44,4 +45,6 @@ For the main types you may simply use Convert()
 
 But you may build your own converters upon it, add own types and conversion functions and overwrite the default conversions.
 
-Look into the examples directory and see the Documentation at http://godoc.org/github.com/metakeule/typeconverter
+Look into the examples directory.
+*/
+package typeconverter

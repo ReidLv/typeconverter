@@ -70,7 +70,7 @@ func ExampleNew_ownType() {
 	c.Input.AddType(sp)
 	c.Output.AddType(&sp)
 	c.Output.SetHandler("*typeconverter.Special", func(out interface{}, in interface{}) (err error) {
-		*out.(*Special) = Special(in.(Stringer).String())
+		*out.(*Special) = Special(in.(Stringer).String() + " as special")
 		return
 	})
 
@@ -86,7 +86,7 @@ func ExampleNew_ownType() {
 	e := c.Convert(Special(""), &t)
 	fmt.Println(e)
 	// Output: to int: 42
-	// to special: 4.5
+	// to special: 4.5 as special
 	// interface conversion: typeconverter.Special is not typeconverter.Timer: missing method Time
 }
 

@@ -12,7 +12,11 @@ type convert struct {
 
 func Convert(i interface{}) *convert {
 	switch t := i.(type) {
+	case Int, Int64, Float, Float32, Bool, String, Time, Json, Map, Array, Default:
+		return &convert{t}
 	case int:
+		return &convert{Int(t)}
+	case int32:
 		return &convert{Int(t)}
 	case int64:
 		return &convert{Int64(t)}
@@ -30,8 +34,6 @@ func Convert(i interface{}) *convert {
 		return &convert{Map(t)}
 	case []interface{}:
 		return &convert{Array(t)}
-	case Int, Int64, Float, Float32, Bool, String, Time, Json, Map, Array, Default:
-		return &convert{t}
 	default:
 		if IsString(t) {
 			return &convert{String(fmt.Sprintf("%s", t))}
@@ -43,7 +45,7 @@ func Convert(i interface{}) *convert {
 			return &convert{String(string(b))}
 		}
 	}
-	return &convert{String(fmt.Sprintf("%v", i))}
+	return &convert{Default(0)}
 }
 
 func (ø convert) ToInt() int                    { return ø.value.(Inter).Int() }

@@ -10,8 +10,11 @@ type Arrayer interface {
 
 type Array []interface{}
 
-func (ø Array) Array() []interface{} { return []interface{}{ø} }
-func (ø Array) String() string       { return ø.Json() }
+func (ø Array) Array() (a []interface{}) {
+	a = ø
+	return
+}
+func (ø Array) String() string { return ø.Json() }
 
 func (ø Array) Json() string {
 	b, err := json.Marshal(ø)

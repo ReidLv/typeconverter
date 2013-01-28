@@ -2,6 +2,7 @@ package typeconverter
 
 import (
 	"encoding/json"
+	"time"
 )
 
 type Json string
@@ -23,6 +24,15 @@ func (ø Json) Float() float64 {
 	err := json.Unmarshal([]byte(ø), &i)
 	if err != nil {
 		panic("can't convert " + ø + " to float")
+	}
+	return i
+}
+
+func (ø Json) Time() time.Time {
+	var i time.Time
+	err := json.Unmarshal([]byte(ø), &i)
+	if err != nil {
+		panic("can't convert " + ø + " to time")
 	}
 	return i
 }

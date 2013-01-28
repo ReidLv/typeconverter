@@ -12,12 +12,13 @@ func (ø MyString) Int() int {
 }
 
 func MyConverter() *conv.BasicConverter {
+	var s string
 	c := conv.New()
 
 	// if the input is of the type string
 	// transform it to MyString and call the output
 	// dispatcher
-	c.Input.SetHandler("string",
+	c.Input.SetHandler(s,
 		func(in interface{}, out interface{}) (err error) {
 			c.Output.Dispatch(out, MyString(in.(string)))
 			return
@@ -25,7 +26,8 @@ func MyConverter() *conv.BasicConverter {
 
 	// if input should be transformed to string
 	// change the output and add " was the answer" to normal string conversion
-	c.Output.SetHandler("*string",
+
+	c.Output.SetHandler(&s,
 		func(out interface{}, in interface{}) (err error) {
 			*out.(*string) = in.(conv.Stringer).String() + " was the answer"
 			return

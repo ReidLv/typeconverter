@@ -24,9 +24,7 @@ func main() {
 	c := conv.New()
 
 	sp := Special("")
-	c.Input.AddType(sp)                             // register input type with an instance of the type
-	c.Output.AddType(&sp)                           // register output type with a pointer (important) to an instance of the type
-	c.Output.SetHandler("*main.Special", toSpecial) // register output handler for the pointer (important) type
+	c.Output.SetHandler(&sp, toSpecial) // register output handler for the pointer (important) type
 
 	var i int
 	c.Convert(Special("hello"), &i)

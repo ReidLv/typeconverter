@@ -61,7 +61,7 @@ func (ø String) Json() string {
 }
 
 // checks, if something is a string or Stringer
-func IsString(i interface{}) bool {
+func isString(i interface{}) bool {
 	if _, ok := i.(string); ok {
 		return true
 	}

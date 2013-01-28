@@ -7,12 +7,16 @@ import (
 	"time"
 )
 
-type Converter struct {
+type Converter interface {
+	Convert(from interface{}, to interface{}) (err error)
+}
+
+type BasicConverter struct {
 	Output *dispatch.Dispatcher
 	Input  *dispatch.Dispatcher
 }
 
-func (ø *Converter) Convert(from interface{}, to interface{}) (err error) {
+func (ø *BasicConverter) Convert(from interface{}, to interface{}) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%s", r)
@@ -26,8 +30,8 @@ var basicConvert = New()
 
 func Convert(from interface{}, to interface{}) (err error) { return basicConvert.Convert(from, to) }
 
-func New() (ø *Converter) {
-	ø = &Converter{dispatch.New(), dispatch.New()}
+func New() (ø *BasicConverter) {
+	ø = &BasicConverter{dispatch.New(), dispatch.New()}
 
 	ø.Input.AddType(Int(0))
 	ø.Input.AddType(Int64(0))
@@ -98,7 +102,7 @@ func New() (ø *Converter) {
 			ø.Output.Dispatch(out, in)
 			return
 		}
-		if IsString(in) {
+		if isString(in) {
 			ø.Output.Dispatch(out, String(fmt.Sprintf("%s", in)))
 		} else {
 			b, err := json.Marshal(in)

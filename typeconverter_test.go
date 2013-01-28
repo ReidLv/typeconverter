@@ -22,6 +22,31 @@ func dispatchToSpecial(out interface{}, in interface{}) (err error) {
 }
 
 // convert time to string
+func ExampleConvert_default() {
+	var d Default
+	var s string
+	Convert(d, &s)
+	fmt.Printf("default string: %#v\n", s)
+	var i int
+	Convert(d, &i)
+	fmt.Printf("default int: %#v\n", i)
+	var f float64
+	Convert(d, &f)
+	fmt.Printf("default float: %#v\n", f)
+	var j Json
+	Convert(d, &j)
+	fmt.Printf("default json: %#v\n", j)
+	var t time.Time
+	Convert(d, &t)
+	fmt.Printf("default time: %#v\n", Time(t).String())
+	// Output: default string: ""
+	// default int: 0
+	// default float: 0
+	// default json: "{}"
+	// default time: "0001-01-01T00:00:00Z"
+}
+
+// convert time to string
 func ExampleConvert() {
 	var s string
 	t1, _ := time.Parse(time.RFC3339, "2011-01-26T18:53:18+01:00")
@@ -191,7 +216,7 @@ var toArray = map[interface{}][]interface{}{
 func TestToArray(t *testing.T) {
 	for in, out := range toArray {
 		var r []interface{}
-		if Convert(in, &r); r[0].(string) != out[0].(string) || ToInt(r[1].(float64)) != out[1].(int) {
+		if Convert(in, &r); r[0].(string) != out[0].(string) || toInt32(r[1].(float64)) != out[1].(int) {
 			err(t, "ToArray", r, out)
 		}
 	}

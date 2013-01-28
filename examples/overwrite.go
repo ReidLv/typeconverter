@@ -11,7 +11,7 @@ func (ø MyString) Int() int {
 	return 42
 }
 
-func MyConverter() *conv.Converter {
+func MyConverter() *conv.BasicConverter {
 	c := conv.New()
 
 	// if the input is of the type string

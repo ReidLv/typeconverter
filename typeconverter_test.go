@@ -21,7 +21,7 @@ func dispatchToSpecial(out interface{}, in interface{}) (err error) {
 	return
 }
 
-// convert time to string
+// convert default to different types to get the defaults
 func ExampleConvert_default() {
 	var d Default
 	var s string
@@ -55,6 +55,7 @@ func ExampleConvert() {
 	// Output: 2011-01-26T18:53:18+01:00
 }
 
+// define your own type and integrate it to the converter
 func ExampleNew_ownType() {
 	/* we defined
 	type Special string
@@ -89,6 +90,7 @@ func ExampleNew_ownType() {
 	// interface conversion: typeconverter.Special is not typeconverter.Timer: missing method Time
 }
 
+// overwrite builtin conversions
 func ExampleNew_overwrite() {
 	c := New()
 	// if input should be transformed to string

@@ -21,7 +21,7 @@ func (ø *BasicConverter) Convert(from interface{}, to interface{}) (err error) 
 			err = fmt.Errorf("%s", r)
 		}
 	}()
-	ø.Input.Dispatch(from, to)
+	err = ø.Input.Dispatch(from, to)
 	return
 }
 

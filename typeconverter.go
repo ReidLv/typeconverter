@@ -31,8 +31,8 @@ var int64Instance = int64(0)
 var float64Instance = float64(0)
 var float32Instance = float32(0)
 var stringInstance = string("")
-var jsonInstance = json("")
-var xmlInstance = xml("")
+var jsonInstance = Json("")
+var xmlInstance = Xml("")
 var boolInstance = bool(true)
 var timeInstance = time.Time{}
 var mapInstance = map[string]interface{}{}
@@ -50,7 +50,7 @@ func New() (ø *BasicConverter) {
 		case int:
 			err = ø.Output.Dispatch(to, Int(t))
 		case int32:
-			err = ø.Output.Dispatch(to, Int(t))
+			err = ø.Output.Dispatch(to, Int(int(t)))
 		case int64:
 			err = ø.Output.Dispatch(to, Int64(t))
 		case float64:
@@ -107,10 +107,10 @@ func New() (ø *BasicConverter) {
 			*out.(*float32) = float32(in.(Floater).Float())
 		case *time.Time:
 			*out.(*time.Time) = in.(Timer).Time()
-		case *json:
-			*out.(*json) = json(in.(Jsoner).Json())
-		case *xml:
-			*out.(*xml) = xml(in.(Xmler).Xml())
+		case *JsonType:
+			*out.(*JsonType) = Json(in.(Jsoner).Json())
+		case *XmlType:
+			*out.(*XmlType) = Xml(in.(Xmler).Xml())
 		case *map[string]interface{}:
 			*out.(*map[string]interface{}) = in.(Mapper).Map()
 		case *[]interface{}:

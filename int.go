@@ -10,15 +10,17 @@ type Inter interface {
 	Int() int
 }
 
-type Int int
+type IntType int
 
-func (ø Int) String() string  { return fmt.Sprintf("%v", ø.Int()) }
-func (ø Int) Int() int        { return int(ø) }
-func (ø Int) Float() float64  { return float64(ø) }
-func (ø Int) Json() string    { return ø.String() }
-func (ø Int) Time() time.Time { return time.Unix(int64(ø), 0) }
+func Int(b int) IntType { return IntType(b) }
 
-func (ø Int) Xml() string {
+func (ø IntType) String() string  { return fmt.Sprintf("%v", ø.Int()) }
+func (ø IntType) Int() int        { return int(ø) }
+func (ø IntType) Float() float64  { return float64(ø) }
+func (ø IntType) Json() string    { return ø.String() }
+func (ø IntType) Time() time.Time { return time.Unix(int64(ø), 0) }
+
+func (ø IntType) Xml() string {
 	b, err := xl.Marshal(int(ø))
 	if err != nil {
 		panic("can't convert " + ø.String() + " to xml")
@@ -26,15 +28,17 @@ func (ø Int) Xml() string {
 	return string(b)
 }
 
-type Int64 int64
+type IntType64 int64
 
-func (ø Int64) String() string  { return fmt.Sprintf("%v", ø.Int()) }
-func (ø Int64) Int() int        { return int(ø) }
-func (ø Int64) Float() float64  { return float64(ø) }
-func (ø Int64) Json() string    { return ø.String() }
-func (ø Int64) Time() time.Time { return time.Unix(int64(ø), 0) }
+func Int64(b int64) IntType64 { return IntType64(b) }
 
-func (ø Int64) Xml() string {
+func (ø IntType64) String() string  { return fmt.Sprintf("%v", ø.Int()) }
+func (ø IntType64) Int() int        { return int(ø) }
+func (ø IntType64) Float() float64  { return float64(ø) }
+func (ø IntType64) Json() string    { return ø.String() }
+func (ø IntType64) Time() time.Time { return time.Unix(int64(ø), 0) }
+
+func (ø IntType64) Xml() string {
 	b, err := xl.Marshal(int(ø))
 	if err != nil {
 		panic("can't convert " + ø.String() + " to xml")

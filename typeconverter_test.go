@@ -21,7 +21,7 @@ func dispatchToSpecial(out interface{}, in interface{}) (err error) {
 
 // convert default to different types to get the defaults
 func ExampleConvert_default() {
-	var d Default
+	var d DefaultType
 	var s string
 	Convert(d, &s)
 	fmt.Printf("default string: %#v\n", s)
@@ -336,7 +336,7 @@ var toXmlTests = map[interface{}]string{
 
 func TestToXml(t *testing.T) {
 	for in, out := range toXmlTests {
-		r := xml("")
+		r := Xml("")
 		e := Convert(in, &r)
 		if e != nil {
 			err(t, "ToXml error", e.Error(), nil)
@@ -345,7 +345,7 @@ func TestToXml(t *testing.T) {
 			err(t, "ToXml", string(r), out)
 		}
 	}
-	r := xml(``)
+	r := Xml(``)
 
 	a := []interface{}{"a", 3, 4.5}
 	out := `<string>a</string><int>3</int><float64>4.5</float64>`

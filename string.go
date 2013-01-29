@@ -8,15 +8,16 @@ import (
 	"time"
 )
 
-type String string
-
 type Stringer interface {
 	String() string
 }
+type StringType string
 
-func (ø String) String() string { return string(ø) }
+func String(s string) StringType { return StringType(s) }
 
-func (ø String) Int() int {
+func (ø StringType) String() string { return string(ø) }
+
+func (ø StringType) Int() int {
 	ii, err := strconv.ParseInt(ø.String(), 10, 32)
 	if err != nil {
 		var f float64
@@ -29,7 +30,7 @@ func (ø String) Int() int {
 	return int(ii)
 }
 
-func (ø String) Float() float64 {
+func (ø StringType) Float() float64 {
 	f, err := strconv.ParseFloat(ø.String(), 64)
 	if err != nil {
 		panic("can't convert " + ø.String() + "to float64")
@@ -37,7 +38,7 @@ func (ø String) Float() float64 {
 	return f
 }
 
-func (ø String) Time() time.Time {
+func (ø StringType) Time() time.Time {
 	tt, err := time.Parse(time.RFC3339, ø.String())
 	if err != nil {
 		panic("can't convert " + ø.String() + "to time")
@@ -45,7 +46,7 @@ func (ø String) Time() time.Time {
 	return tt
 }
 
-func (ø String) Bool() bool {
+func (ø StringType) Bool() bool {
 	b, err := strconv.ParseBool(ø.String())
 	if err != nil {
 		panic("can't convert " + ø.String() + "to bool")
@@ -53,7 +54,7 @@ func (ø String) Bool() bool {
 	return b
 }
 
-func (ø String) Json() string {
+func (ø StringType) Json() string {
 	b, err := js.Marshal(ø.String())
 	if err != nil {
 		panic("can't convert " + fmt.Sprintf("%v", ø.String()) + " to json")
@@ -61,7 +62,7 @@ func (ø String) Json() string {
 	return string(b)
 }
 
-func (ø String) Xml() string {
+func (ø StringType) Xml() string {
 	b, err := xl.Marshal(string(ø))
 	if err != nil {
 		panic("can't convert " + string(ø) + " to xml")

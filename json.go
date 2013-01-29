@@ -10,7 +10,7 @@ type Jsoner interface {
 	Json() string
 }
 
-func Json(s string) json {
+func Json(s string) JsonType {
 	if strings.Contains(s, "{") {
 		m := map[string]interface{}{}
 		err := js.Unmarshal([]byte(s), &m)
@@ -18,12 +18,12 @@ func Json(s string) json {
 			panic("'" + s + "' is  not a valid json: " + err.Error())
 		}
 	}
-	return json(s)
+	return JsonType(s)
 }
 
-type json string
+type JsonType string
 
-func (ø json) Int() int {
+func (ø JsonType) Int() int {
 	var i float64
 	err := js.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -32,7 +32,7 @@ func (ø json) Int() int {
 	return Float(i).Int()
 }
 
-func (ø json) Float() float64 {
+func (ø JsonType) Float() float64 {
 	var i float64
 	err := js.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -41,7 +41,7 @@ func (ø json) Float() float64 {
 	return i
 }
 
-func (ø json) Time() time.Time {
+func (ø JsonType) Time() time.Time {
 	var i time.Time
 	err := js.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -50,10 +50,10 @@ func (ø json) Time() time.Time {
 	return i
 }
 
-func (ø json) String() string { return string(ø) }
-func (ø json) Json() string   { return string(ø) }
+func (ø JsonType) String() string { return string(ø) }
+func (ø JsonType) Json() string   { return string(ø) }
 
-func (ø json) Bool() bool {
+func (ø JsonType) Bool() bool {
 	var i bool
 	err := js.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -62,7 +62,7 @@ func (ø json) Bool() bool {
 	return i
 }
 
-func (ø json) Array() []interface{} {
+func (ø JsonType) Array() []interface{} {
 	ia := []interface{}{}
 	err := js.Unmarshal([]byte(ø), &ia)
 	if err != nil {
@@ -71,7 +71,7 @@ func (ø json) Array() []interface{} {
 	return ia
 }
 
-func (ø json) Map() map[string]interface{} {
+func (ø JsonType) Map() map[string]interface{} {
 	ia := map[string]interface{}{}
 	err := js.Unmarshal([]byte(ø), &ia)
 	if err != nil {

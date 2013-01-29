@@ -11,21 +11,23 @@ type Xmler interface {
 	Xml() string
 }
 
-func Xml(s string) xml {
+func Xml(s string) XmlType {
 	var str string
-	err := xl.NewDecoder(strings.NewReader(s)).Decode(&str)
-	if err != nil {
-		panic("'" + s + "' is  not a valid xml: " + err.Error())
+	if s != "" {
+		err := xl.NewDecoder(strings.NewReader(s)).Decode(&str)
+		if err != nil {
+			panic("'" + s + "' is  not a valid xml: " + err.Error())
+		}
 	}
-	return xml(s)
+	return XmlType(s)
 }
 
-type xml string
+type XmlType string
 
-func (ø xml) String() string { return string(ø) }
-func (ø xml) Xml() string    { return string(ø) }
+func (ø XmlType) String() string { return string(ø) }
+func (ø XmlType) Xml() string    { return string(ø) }
 
-func (ø xml) Int() int {
+func (ø XmlType) Int() int {
 	var i float64
 	err := xl.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -34,7 +36,7 @@ func (ø xml) Int() int {
 	return Float(i).Int()
 }
 
-func (ø xml) Float() float64 {
+func (ø XmlType) Float() float64 {
 	var i float64
 	err := xl.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -43,7 +45,7 @@ func (ø xml) Float() float64 {
 	return i
 }
 
-func (ø xml) Time() time.Time {
+func (ø XmlType) Time() time.Time {
 	var i time.Time
 	err := xl.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -52,7 +54,7 @@ func (ø xml) Time() time.Time {
 	return i
 }
 
-func (ø xml) Bool() bool {
+func (ø XmlType) Bool() bool {
 	var i bool
 	err := xl.Unmarshal([]byte(ø), &i)
 	if err != nil {
@@ -68,7 +70,7 @@ type arrayXmlHelper struct {
 	Time    []time.Time
 }
 
-func (ø xml) Array() []interface{} {
+func (ø XmlType) Array() []interface{} {
 	var err error
 	ia := []interface{}{}
 	ah := arrayXmlHelper{}

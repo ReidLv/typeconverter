@@ -4,13 +4,15 @@ import (
 	"time"
 )
 
-type Default int
+type DefaultType int
 
-func (ø Default) String() string              { return "" }
-func (ø Default) Int() int                    { return 0 }
-func (ø Default) Float() float64              { return float64(0) }
-func (ø Default) Time() time.Time             { return time.Time{} }
-func (ø Default) Json() string                { return "{}" }
-func (ø Default) Array() []interface{}        { return []interface{}{} }
-func (ø Default) Bool() bool                  { return false }
-func (ø Default) Map() map[string]interface{} { return map[string]interface{}{} }
+func Default(b int) DefaultType { return DefaultType(b) }
+
+func (ø DefaultType) String() string              { return "" }
+func (ø DefaultType) Int() int                    { return 0 }
+func (ø DefaultType) Float() float64              { return float64(0) }
+func (ø DefaultType) Time() time.Time             { return time.Time{} }
+func (ø DefaultType) Json() string                { return "{}" }
+func (ø DefaultType) Array() []interface{}        { return []interface{}{} }
+func (ø DefaultType) Bool() bool                  { return false }
+func (ø DefaultType) Map() map[string]interface{} { return map[string]interface{}{} }

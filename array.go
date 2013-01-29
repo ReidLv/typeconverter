@@ -9,15 +9,17 @@ type Arrayer interface {
 	Array() []interface{}
 }
 
-type Array []interface{}
+func Array(a []interface{}) ArrayType { return ArrayType(a) }
 
-func (ø Array) Array() (a []interface{}) {
+type ArrayType []interface{}
+
+func (ø ArrayType) Array() (a []interface{}) {
 	a = ø
 	return
 }
-func (ø Array) String() string { return ø.Json() }
+func (ø ArrayType) String() string { return ø.Json() }
 
-func (ø Array) Json() string {
+func (ø ArrayType) Json() string {
 	b, err := js.Marshal(ø)
 	if err != nil {
 		panic("can't convert " + ø.String() + " to json")
@@ -25,7 +27,7 @@ func (ø Array) Json() string {
 	return string(b)
 }
 
-func (ø Array) Xml() string {
+func (ø ArrayType) Xml() string {
 	b, err := xl.Marshal(ø)
 	if err != nil {
 		panic("can't convert " + ø.String() + " to xml")

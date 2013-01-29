@@ -9,13 +9,15 @@ type Booler interface {
 	Bool() bool
 }
 
-type Bool bool
+type BoolType bool
 
-func (ø Bool) String() string { return fmt.Sprintf("%v", ø.Bool()) }
-func (ø Bool) Json() string   { return ø.String() }
-func (ø Bool) Bool() bool     { return bool(ø) }
+func Bool(b bool) BoolType { return BoolType(b) }
 
-func (ø Bool) Xml() string {
+func (ø BoolType) String() string { return fmt.Sprintf("%v", ø.Bool()) }
+func (ø BoolType) Json() string   { return ø.String() }
+func (ø BoolType) Bool() bool     { return bool(ø) }
+
+func (ø BoolType) Xml() string {
 	b, err := xl.Marshal(bool(ø))
 	if err != nil {
 		panic("can't convert " + ø.String() + " to xml")

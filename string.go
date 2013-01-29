@@ -1,7 +1,8 @@
 package typeconverter
 
 import (
-	"encoding/json"
+	js "encoding/json"
+	xl "encoding/xml"
 	"fmt"
 	"strconv"
 	"time"
@@ -53,9 +54,17 @@ func (ø String) Bool() bool {
 }
 
 func (ø String) Json() string {
-	b, err := json.Marshal(ø.String())
+	b, err := js.Marshal(ø.String())
 	if err != nil {
 		panic("can't convert " + fmt.Sprintf("%v", ø.String()) + " to json")
+	}
+	return string(b)
+}
+
+func (ø String) Xml() string {
+	b, err := xl.Marshal(string(ø))
+	if err != nil {
+		panic("can't convert " + string(ø) + " to xml")
 	}
 	return string(b)
 }

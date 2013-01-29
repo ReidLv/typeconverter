@@ -1,7 +1,8 @@
 package typeconverter
 
 import (
-	"encoding/json"
+	js "encoding/json"
+	xl "encoding/xml"
 )
 
 type Arrayer interface {
@@ -17,9 +18,17 @@ func (ø Array) Array() (a []interface{}) {
 func (ø Array) String() string { return ø.Json() }
 
 func (ø Array) Json() string {
-	b, err := json.Marshal(ø)
+	b, err := js.Marshal(ø)
 	if err != nil {
 		panic("can't convert " + ø.String() + " to json")
+	}
+	return string(b)
+}
+
+func (ø Array) Xml() string {
+	b, err := xl.Marshal(ø)
+	if err != nil {
+		panic("can't convert " + ø.String() + " to xml")
 	}
 	return string(b)
 }

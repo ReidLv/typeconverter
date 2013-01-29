@@ -31,7 +31,8 @@ var int64Instance = int64(0)
 var float64Instance = float64(0)
 var float32Instance = float32(0)
 var stringInstance = string("")
-var jsonInstance = Json("")
+var jsonInstance = json("")
+var xmlInstance = xml("")
 var boolInstance = bool(true)
 var timeInstance = time.Time{}
 var mapInstance = map[string]interface{}{}
@@ -82,6 +83,7 @@ func New() (ø *BasicConverter) {
 	ø.Input.SetHandler(timeInstance, inSwitch)
 	ø.Input.SetHandler(mapInstance, inSwitch)
 	ø.Input.SetHandler(arrInstance, inSwitch)
+	ø.Input.SetHandler(xmlInstance, inSwitch)
 
 	ø.Input.AddFallback(func(in interface{}, out interface{}) (didHandle bool, err error) {
 		didHandle = true
@@ -105,8 +107,10 @@ func New() (ø *BasicConverter) {
 			*out.(*float32) = float32(in.(Floater).Float())
 		case *time.Time:
 			*out.(*time.Time) = in.(Timer).Time()
-		case *Json:
-			*out.(*Json) = Json(in.(Jsoner).Json())
+		case *json:
+			*out.(*json) = json(in.(Jsoner).Json())
+		case *xml:
+			*out.(*xml) = xml(in.(Xmler).Xml())
 		case *map[string]interface{}:
 			*out.(*map[string]interface{}) = in.(Mapper).Map()
 		case *[]interface{}:
@@ -128,5 +132,6 @@ func New() (ø *BasicConverter) {
 	ø.Output.SetHandler(&jsonInstance, outSwitcher)
 	ø.Output.SetHandler(&mapInstance, outSwitcher)
 	ø.Output.SetHandler(&arrInstance, outSwitcher)
+	ø.Output.SetHandler(&xmlInstance, outSwitcher)
 	return
 }

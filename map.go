@@ -1,7 +1,7 @@
 package typeconverter
 
 import (
-	"encoding/json"
+	js "encoding/json"
 	"fmt"
 )
 
@@ -15,7 +15,7 @@ func (ø Map) Map() map[string]interface{} { return map[string]interface{}(ø) }
 func (ø Map) String() string              { return ø.Json() }
 
 func (ø Map) Json() string {
-	b, err := json.Marshal(ø)
+	b, err := js.Marshal(ø)
 	if err != nil {
 		panic("can't convert " + fmt.Sprintf("%v", ø) + " to json")
 	}

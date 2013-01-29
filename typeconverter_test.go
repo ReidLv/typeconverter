@@ -31,7 +31,7 @@ func ExampleConvert_default() {
 	var f float64
 	Convert(d, &f)
 	fmt.Printf("default float: %#v\n", f)
-	var j Json
+	j := Json("")
 	Convert(d, &j)
 	fmt.Printf("default json: %#v\n", j)
 	var t time.Time
@@ -106,15 +106,16 @@ var _ = fmt.Errorf
 var ti, _ = time.Parse(time.RFC3339, "2011-01-26T18:53:18+01:00")
 
 var toIntTests = map[interface{}]int{
-	1:            1,
-	int64(2):     2,
-	float64(3.0): 3,
-	float32(3.0): 3,
-	Json(`3.0`):  3,
-	Json(`3`):    3,
-	`1`:          1,
-	`1.0`:        1,
-	ti:           1296064398,
+	1:                   1,
+	int64(2):            2,
+	float64(3.0):        3,
+	float32(3.0):        3,
+	Json(`3.0`):         3,
+	Json(`3`):           3,
+	`1`:                 1,
+	`1.0`:               1,
+	ti:                  1296064398,
+	Xml(`<int>1</int>`): 1,
 }
 
 func TestToInt(t *testing.T) {
@@ -135,6 +136,7 @@ var toFloatTests = map[interface{}]float64{
 	Json(`3`):    3.0,
 	`1`:          1.0,
 	`1.5`:        1.5,
+	Xml(`<float64>1.5</float64>`): 1.5,
 }
 
 func TestToFloat(t *testing.T) {
@@ -147,12 +149,13 @@ func TestToFloat(t *testing.T) {
 }
 
 var toBoolTests = map[interface{}]bool{
-	true:          true,
-	false:         false,
-	Json(`true`):  true,
-	Json(`false`): false,
-	`true`:        true,
-	`false`:       false,
+	true:                     true,
+	false:                    false,
+	Json(`true`):             true,
+	Json(`false`):            false,
+	`true`:                   true,
+	`false`:                  false,
+	Xml("<bool>true</bool>"): true,
 }
 
 func TestToBool(t *testing.T) {
@@ -173,6 +176,7 @@ var toStringTests = map[interface{}]string{
 	true:         `true`,
 	Json(`{}`):   `{}`,
 	`hi`:         `hi`,
+	Xml(`<string>hi</string>`): `<string>hi</string>`,
 }
 
 func TestToString(t *testing.T) {
@@ -198,15 +202,35 @@ func TestToString(t *testing.T) {
 
 }
 
-var toArrayTests = map[interface{}][]interface{}{
+var toArrayTestsJson = map[interface{}][]interface{}{
 	Json(`["a",4]`): []interface{}{"a", 4},
 }
 
+// warning: order gets lost, the result returns ordered by types
+// also see the mandatory uppercase tags
+var toArrayTestsXml = map[interface{}][]interface{}{
+	Xml(`<Int>2</Int><Float64>4.5</Float64><Int>6</Int><String>hi</String><Time>` + timeString + `</Time>`): []interface{}{2, 6, 4.5, "hi", ti},
+}
+
 func TestToArray(t *testing.T) {
-	for in, out := range toArrayTests {
+	for in, out := range toArrayTestsJson {
 		var r []interface{}
-		if Convert(in, &r); r[0].(string) != out[0].(string) || toInt(r[1].(float64)) != out[1].(int) {
-			err(t, "ToArray", r, out)
+		if Convert(in, &r); r[0].(string) != out[0].(string) ||
+			toInt(r[1].(float64)) != out[1].(int) {
+
+			err(t, "ToArray (Json)", r, out)
+		}
+	}
+
+	for in, out := range toArrayTestsXml {
+		var r []interface{}
+		if Convert(in, &r); r[0].(int) != out[0].(int) ||
+			r[1].(int) != out[1].(int) ||
+			r[2].(float64) != out[2].(float64) ||
+			r[3].(string) != out[3].(string) ||
+			r[4].(time.Time).UTC().Format(time.RFC3339) != out[4].(time.Time).UTC().Format(time.RFC3339) {
+
+			err(t, "ToArray (Xml)", r, out)
 		}
 	}
 
@@ -250,8 +274,9 @@ var toTimeTests = map[interface{}]string{
 	//float32(timeFloat): tiFloatString,
 	//float64(timeFloat): tiFloatString,
 	ti: timeString,
-	Json(`"` + timeString + `"`): timeString,
-	timeString:                   timeString,
+	Json(`"` + timeString + `"`):           timeString,
+	timeString:                             timeString,
+	Xml("<Time>" + timeString + "</Time>"): timeString,
 }
 
 func TestToTime(t *testing.T) {
@@ -278,7 +303,7 @@ var toJsonTests = map[interface{}]string{
 
 func TestToJson(t *testing.T) {
 	for in, out := range toJsonTests {
-		var r Json
+		r := Json("")
 		if Convert(in, &r); string(r) != out {
 			err(t, "ToJson", string(r), out)
 		}
@@ -286,7 +311,7 @@ func TestToJson(t *testing.T) {
 
 	m := map[string]interface{}{"a": 3}
 	out := `{"a":3}`
-	var r Json
+	r := Json(``)
 	if Convert(m, &r); string(r) != out {
 		err(t, "ToJson", string(r), out)
 	}
@@ -297,4 +322,34 @@ func TestToJson(t *testing.T) {
 		err(t, "ToJson", string(r), out)
 	}
 
+}
+
+var toXmlTests = map[interface{}]string{
+	1:            "<int>1</int>",
+	int64(2):     "<int>2</int>",
+	3.5:          "<float64>3.5</float64>",
+	float32(3.5): "<float32>3.5</float32>",
+	`hi`:         `<string>hi</string>`,
+	true:         `<bool>true</bool>`,
+	ti:           `<Time>2011-01-26T18:53:18+01:00</Time>`,
+}
+
+func TestToXml(t *testing.T) {
+	for in, out := range toXmlTests {
+		r := xml("")
+		e := Convert(in, &r)
+		if e != nil {
+			err(t, "ToXml error", e.Error(), nil)
+		}
+		if string(r) != out {
+			err(t, "ToXml", string(r), out)
+		}
+	}
+	r := xml(``)
+
+	a := []interface{}{"a", 3, 4.5}
+	out := `<string>a</string><int>3</int><float64>4.5</float64>`
+	if Convert(a, &r); string(r) != out {
+		err(t, "ToXml", string(r), out)
+	}
 }

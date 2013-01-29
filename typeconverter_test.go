@@ -237,10 +237,10 @@ func TestToMap(t *testing.T) {
 
 }
 
-var timeString = ti.Format(time.RFC3339)
-var timeUnix = ti.Unix()
+var timeString = ti.UTC().Format(time.RFC3339)
+var timeUnix = ti.UTC().Unix()
 var timeFloat = float64(1010000000)
-var tiFloat = time.Unix(1010000000, 0)
+var tiFloat = time.Unix(1010000000, 0).UTC()
 var tiFloatString = tiFloat.Format(time.RFC3339)
 
 var toTimeTests = map[interface{}]string{
@@ -257,16 +257,10 @@ var toTimeTests = map[interface{}]string{
 func TestToTime(t *testing.T) {
 	for in, out := range toTimeTests {
 		var r time.Time
-		//r = r.UTC()
 		Convert(in, &r)
-		/*
-			if r.UTC().Format(time.RFC3339) != out {
-				err(t, "ToTime", r.UTC().Format(time.RFC3339), out)
-			}
-		*/
 
-		if r.Format(time.RFC3339) != out {
-			err(t, "ToTime", r.Format(time.RFC3339), out)
+		if r.UTC().Format(time.RFC3339) != out {
+			err(t, "ToTime", r.UTC().Format(time.RFC3339), out)
 		}
 	}
 }

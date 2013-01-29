@@ -238,20 +238,20 @@ func TestToMap(t *testing.T) {
 }
 
 var toTimeTests = map[interface{}]string{
-	1010000000:          "2002-01-02T20:33:20+01:00",
-	int64(1010000000):   "2002-01-02T20:33:20+01:00",
-	float32(1010000000): "2001-09-09T03:46:40+02:00",
-	float64(1010000000): "2001-09-09T03:46:40+02:00",
-	ti:                  `2011-01-26T18:53:18+01:00`,
-	Json(`"2011-01-26T18:53:18+01:00"`): `2011-01-26T18:53:18+01:00`,
-	`2011-01-26T18:53:18+01:00`:         `2011-01-26T18:53:18+01:00`,
+	int32(1010000000):   "Wed Jan  2 20:33:20 2002",
+	int64(1010000000):   "Wed Jan  2 20:33:20 2002",
+	float32(1010000000): "Sun Sep  9 03:46:40 2001",
+	float64(1010000000): "Sun Sep  9 03:46:40 2001",
+	ti:                  `Wed Jan 26 18:53:18 2011`,
+	Json(`"2011-01-26T18:53:18+01:00"`): `Wed Jan 26 18:53:18 2011`,
+	`2011-01-26T18:53:18+01:00`:         `Wed Jan 26 18:53:18 2011`,
 }
 
 func TestToTime(t *testing.T) {
 	for in, out := range toTimeTests {
 		var r time.Time
-		if Convert(in, &r); Time(r).String() != out {
-			err(t, "ToTime", Time(r).String(), out)
+		if Convert(in, &r); r.Format(time.ANSIC) != out {
+			err(t, "ToTime", r.Format(time.ANSIC), out)
 		}
 	}
 }

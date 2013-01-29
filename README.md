@@ -12,6 +12,7 @@ conversion between the following go types (it is possible to add your own):
  - *time.Time
  - string/Stringer
  - json
+ - xml
  - []interface{}
  - map[string]interface{}
 

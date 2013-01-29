@@ -14,6 +14,7 @@ Out of the box the following go types are supported (it is possible to add your 
  - *time.Time
  - string/Stringer
  - json
+ - xml
  - []interface{}
  - map[string]interface{}
 

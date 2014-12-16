@@ -26,7 +26,7 @@ For the main types you may simply use Convert()
 
 	import (
 		"fmt"
-		conv "github.com/metakeule/typeconverter"
+		conv "gopkg.in/metakeule/typeconverter.v2"
 		"time"
 	)
 

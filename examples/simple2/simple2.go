@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	conv "github.com/metakeule/typeconverter"
+	conv "gopkg.in/metakeule/typeconverter.v2"
 )
 
 func main() {

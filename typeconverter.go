@@ -2,8 +2,9 @@ package typeconverter
 
 import (
 	"fmt"
-	"gopkg.in/dispatch.v1"
 	"time"
+
+	"gopkg.in/metakeule/dispatch.v1"
 )
 
 type Converter interface {

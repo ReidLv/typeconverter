@@ -11,24 +11,16 @@ type Floater interface {
 	Float() float64
 }
 
-// stolen from https://groups.google.com/forum/?fromgroups=#!topic/golang-nuts/ITZV08gAugI
-// return rounded version of x with prec precision.
-func roundviaFloat(x float64, prec int) float64 {
-	frep := strconv.FormatFloat(x, 'g', prec, 64)
+func FloatToInt(x float64) int {
+	return int(RoundFloat(x, 0))
+}
+
+// RoundFloat rounds the given float by the given decimals after the dot
+func RoundFloat(x float64, decimals int) float64 {
+	// return roundFloat(x, numDig(x)+decimals)
+	frep := strconv.FormatFloat(x, 'f', decimals, 64)
 	f, _ := strconv.ParseFloat(frep, 64)
 	return f
-}
-
-func numDig(f float64) int {
-	return len(fmt.Sprintf("%0.0f", f))
-}
-
-func FloatToInt(x float64) int {
-	return int(roundviaFloat(x, numDig(x)))
-}
-
-func RoundFloat(x float64, decimals int) float64 {
-	return roundviaFloat(x, numDig(x)+decimals)
 }
 
 func toInt(x float64) int {

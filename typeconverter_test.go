@@ -108,7 +108,7 @@ var ti, _ = time.Parse(time.RFC3339, "2011-01-26T18:53:18+01:00")
 var toIntTests = map[interface{}]int{
 	1:                   1,
 	int64(2):            2,
-	float64(3.0):        3,
+	float64(3.56):       4,
 	float32(3.0):        3,
 	Json(`3.0`):         3,
 	Json(`3`):           3,

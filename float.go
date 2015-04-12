@@ -3,7 +3,6 @@ package typeconverter
 import (
 	xl "encoding/xml"
 	"fmt"
-	"math"
 	"strconv"
 	"time"
 )
@@ -14,18 +13,30 @@ type Floater interface {
 
 // stolen from https://groups.google.com/forum/?fromgroups=#!topic/golang-nuts/ITZV08gAugI
 // return rounded version of x with prec precision.
-func roundViaFloat(x float64, prec int) float64 {
+func roundviaFloat(x float64, prec int) float64 {
 	frep := strconv.FormatFloat(x, 'g', prec, 64)
 	f, _ := strconv.ParseFloat(frep, 64)
 	return f
 }
 
+func numDig(f float64) int {
+	return len(fmt.Sprintf("%0.0f", f))
+}
+
+func FloatToInt(x float64) int {
+	return int(roundviaFloat(x, numDig(x)))
+}
+
+func RoundFloat(x float64, decimals int) float64 {
+	return roundviaFloat(x, numDig(x)+decimals)
+}
+
 func toInt(x float64) int {
-	return int(math.Floor(roundViaFloat(x, 0)))
+	return FloatToInt(x)
 }
 
 func toInt64(x float64) int64 {
-	return int64(math.Floor(roundViaFloat(x, 0)))
+	return int64(FloatToInt(x))
 }
 
 func Float(f float64) FloatType { return FloatType(f) }
